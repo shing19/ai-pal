@@ -9,12 +9,22 @@ export default function Home() {
   return (
     <PalProvider> {/* 使用PalProvider包裹整个应用或部分需要共享Context的组件 */}
       <main className="overflow-hidden h-screen w-screen">
-        <div className="h-screen flex flex-row">
-          <div className="flex-1"></div>
-            <div className="flex-1 bg-yellow-300">
-              <PromptContext /> {/* 这里的Context组件现在可以通过useContext(PalContext)访问和更新sharedValue了 */}
-            </div>
-          <div className=" bg-blue-300 flex-grow p-2">
+        {/* 3:3:4 宽度占比 */}
+        <div
+          className="h-screen flex flex-row gap-2"
+          style={{
+            '--col1': 'calc(18 / (18 + 34 + 48) * 100%)',
+            '--col2': 'calc(34 / (18 + 34 + 48) * 100%)',
+            '--col3': 'calc(48 / (18 + 34 + 48) * 100%)'
+          } as React.CSSProperties}
+        >
+          <div className="flex-none bg-green-300 p-2" style={{ width: 'var(--col1)' }}>
+            <p>project list</p>
+          </div>
+          <div className="flex-none bg-blue-300 p-2" style={{ width: 'var(--col2)' }}>
+            <PromptContext />
+          </div>
+          <div className="flex-grow bg-gray-300 p-2" style={{ width: 'var(--col3)' }}>
             <ChatThreads />
           </div>
         </div>

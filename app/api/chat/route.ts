@@ -11,16 +11,32 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
     const { messages } = await request.json()
 
-    const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-            {role: "system", content: "You are a helpful assistant."},
-            ...messages
-        ],
-        stream: true
-    })
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: "system", content: "You are a helpful assistant."},
+                ...messages
+            ],
+            stream: true
+        })
 
-    const stream = await OpenAIStream(response)
+        const stream = await OpenAIStream(response)
+        return new StreamingTextResponse(stream)
+    } catch (error) {
+        // 如果出现错误,设置备用 baseURL 并重试
+        openai.baseURL = process.env.OPENAI_BASE_URL_BACKUP || ""
 
-    return new StreamingTextResponse(stream)
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {role: "system", content: "You are a helpful assistant."},
+                ...messages
+            ],
+            stream: true
+        })
+
+        const stream = await OpenAIStream(response)
+        return new StreamingTextResponse(stream)
+    }
 }
