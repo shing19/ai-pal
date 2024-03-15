@@ -14,11 +14,7 @@ import Conversation from './Conversation'
 
 const ChatThreads = () => {
     const { input, handleInputChange, handleSubmit, isLoading, messages } = useChat()
-    const { contextMessages, updateContextMessages, projectConversations, updateProjectConversations } = useContext(PalContext);
-
-    useEffect(() => {
-        console.log('projectConversations', projectConversations)
-    }, [projectConversations])
+    const { projectConversations } = useContext(PalContext);
 
     return (
         <div>

@@ -7,14 +7,16 @@ interface PalContextValue {
     contextMessages: Message[];
     updateContextMessages: (newMessages: Message[]) => void;
     projectConversations: ConversationWithinContext[],
-    updateProjectConversations: (newMessages: ConversationWithinContext[]) => void;
+    addProjectConversation: (newMessages: ConversationWithinContext[]) => void;
+    updateProjectConversations: (updatedConversations: ConversationWithinContext[]) => void;
 }
 
 export const PalContext = createContext<PalContextValue>({
     contextMessages: [],
     updateContextMessages: () => { },
     projectConversations: [],
-    updateProjectConversations: () => { },
+    addProjectConversation: () => { },
+    updateProjectConversations: () => { }
 });
 
 // @ts-ignore
@@ -26,16 +28,21 @@ export const PalProvider = ({ children }) => {
     const updateContextMessages = (newMessages: Message[]) => {
         setContextMessages((prevMessages) => [...prevMessages, ...newMessages]);
     }
-    const updateProjectConversations = (newConversations: ConversationWithinContext[]) => {
-        setProjectConversations((prevConversations) => [...prevConversations, ...newConversations]);
+    const addProjectConversation = (newConversation: ConversationWithinContext[]) => {
+        setProjectConversations((prevConversations) => [...prevConversations, ...newConversation]);
+    }
+
+    const updateProjectConversations = (updatedConversations: ConversationWithinContext[]) => {
+        setProjectConversations(updatedConversations);
     }
 
     return (
         <PalContext.Provider
             value={{
-                contextMessages, 
-                updateContextMessages, 
+                contextMessages,
+                updateContextMessages,
                 projectConversations,
+                addProjectConversation,
                 updateProjectConversations
             }}>
             {children}

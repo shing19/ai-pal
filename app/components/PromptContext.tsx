@@ -7,7 +7,7 @@ import ChatInput from './ChatInput'
 
 
 const PromptContext = () => {
-    const { contextMessages, updateContextMessages, projectConversations, updateProjectConversations } = useContext(PalContext);
+    const { contextMessages, updateContextMessages, projectConversations, addProjectConversation } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat()
     const [ newConversation , setNewConversation ] = useState<boolean>(false)
     const [ thisMessages, setThisMessages ] = useState<Message[]>([])
@@ -44,12 +44,12 @@ const PromptContext = () => {
 
     useEffect(() => {
         if ( !isLoading && newConversation && ((thisMessages.length - contextMessages.length == 2))) {
-            const newConversations = {
+            const newConversation = {
                 context: contextMessages,
                 messages: thisMessages,
                 createdAt: new Date(),
             }
-            updateProjectConversations([newConversations])
+            addProjectConversation([newConversation])
             // 重置状态
             setMessages([]) 
             setThisMessages([])
