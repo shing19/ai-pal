@@ -7,22 +7,27 @@ import Chat from './Chat'
 import ChatInput from './ChatInput'
 import { PaperPlaneIcon } from "@radix-ui/react-icons"
 import { MessageLog } from '@/types/global'
-import { useContext, useEffect, useState } from 'react'
+import { use, useContext, useEffect, useState } from 'react'
 import { PalContext } from './PalContext';
+import Conversation from './Conversation'
 
 
 const ChatThreads = () => {
     const { input, handleInputChange, handleSubmit, isLoading, messages } = useChat()
     const { contextMessages, updateContextMessages, projectConversations, updateProjectConversations } = useContext(PalContext);
 
+    useEffect(() => {
+        console.log('projectConversations', projectConversations)
+    }, [projectConversations])
+
     return (
         <div>
             {projectConversations?.map((conversation, index) => {
                 return (
                     <div key={index}>
-                        <Chat messages={conversation.thisMessages} />
+                        <Conversation conversation={conversation} />
                     </div>
-                )
+                );
             })}
             <Chat messages={messages} />
             <div style={{ position: 'relative' }}>

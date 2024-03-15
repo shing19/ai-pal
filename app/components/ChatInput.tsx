@@ -15,7 +15,7 @@ interface ChatInputProps {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>, chatRequestOptions?: ChatRequestOptions) => void;
     isLoading: boolean;
     messages: Message[];
-  }
+}
 
 const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleSubmit, isLoading, messages }) => {
 
@@ -30,39 +30,38 @@ const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleS
         }
     }, [input])
 
-  return (
-    <div>
-    <form onSubmit={handleSubmit}>
-        <p>user message</p>
-        <Textarea
-            placeholder='input something'
-            value={input}
-            onChange={handleInputChange}
-            onKeyDown={e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    // @ts-ignore
-                    handleSubmit(e)
-                }
-            }}
-            style={{ display: 'flex', alignItems: 'center', height: inputHeight }}
-        />
-        <Button
-            type="submit"
-            variant="ghost"
-            size='icon'
-            style={{
-                position: 'absolute',
-                bottom: '0', // 调整到最右下角
-                right: '0', // 调整到最右下角
-            }}
-        >
-            <PaperPlaneIcon />
-        </Button>
-    </form>
-      
-    </div>
-  )
+    return (
+        <div>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingBottom: '3rem' }}>
+                <p>user message</p>
+                <Textarea
+                    placeholder='input something'
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            // @ts-ignore
+                            handleSubmit(e)
+                        }
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', height: inputHeight }}
+                />
+                <Button
+                    type="submit"
+                    variant="ghost"
+                    size='icon'
+                    style={{
+                        position: 'absolute',
+                        bottom: '0.5rem', // 调整按钮距离底部的距离
+                        right: '0rem', // 调整按钮距离右侧的距离
+                    }}
+                >
+                    <PaperPlaneIcon />
+                </Button>
+            </form>
+        </div>
+    )
 }
 
 export default ChatInput

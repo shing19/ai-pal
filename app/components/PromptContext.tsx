@@ -1,5 +1,5 @@
 // Context.tsx
-import React, { useContext, useEffect, useState } from 'react';
+import React, { use, useContext, useEffect, useState } from 'react';
 import { PalContext } from './PalContext';
 import { useChat, Message } from 'ai/react'
 import Chat from './Chat';
@@ -9,6 +9,8 @@ import ChatInput from './ChatInput'
 const PromptContext = () => {
     const { contextMessages, updateContextMessages, projectConversations, updateProjectConversations } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat()
+    const [ newConversation , setNewConversation ] = useState<boolean>(false)
+    const [ thisMessages, setThisMessages ] = useState<Message[]>([])
 
 
     // 拖拽更新 context messages
@@ -28,21 +30,32 @@ const PromptContext = () => {
 
 
     // 处理新对话
-    // 1. 补充 contextMessages
+    const handleSubmitExtended = (e: React.FormEvent<HTMLFormElement>) => {
+        setMessages([...contextMessages, ...messages]);
+        handleSubmit(e);
+        setNewConversation(true)
+    }
+
     useEffect(() => {
-        setMessages(contextMessages)
-    }, [setMessages, contextMessages]);
-    // 2. 提交 form 时更新 projectConversations
+        if ((messages !== thisMessages)) {
+            setThisMessages(messages)
+        }
+    }, [messages, thisMessages, setThisMessages, newConversation])
+
     useEffect(() => {
-        if (messages !== contextMessages) {
+        if ( !isLoading && newConversation && ((thisMessages.length - contextMessages.length == 2))) {
             const newConversations = {
                 context: contextMessages,
-                createdAt: Date.now(),
-                messages: messages
+                messages: thisMessages,
+                createdAt: new Date(),
             }
-            updateProjectConversations([newConversations]);
+            updateProjectConversations([newConversations])
+            // 重置状态
+            setMessages([]) 
+            setThisMessages([])
+            setNewConversation(false)
         }
-    }, [messages, contextMessages, updateProjectConversations]);
+    }, [thisMessages, isLoading])
 
 
     return (
@@ -56,7 +69,7 @@ const PromptContext = () => {
                 <ChatInput
                     input={input}
                     handleInputChange={handleInputChange}
-                    handleSubmit={handleSubmit}
+                    handleSubmit={handleSubmitExtended}
                     isLoading={isLoading}
                     messages={messages} />
             </div>

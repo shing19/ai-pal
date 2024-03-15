@@ -2,8 +2,8 @@
 import { Message } from 'ai/react'
 
 interface ConversationWithinContext {
-  context: Message[];           // clear context, for openai
   createdAt: Date;
+  context: Message[];           // clear context, for openai
   messages: Message[];
 }
 
