@@ -1,22 +1,20 @@
 // Chat.tsx
 import React, { useState } from 'react'
 import { Message } from 'ai/react'
-import { MessageLog } from '@/types/global'
 
 interface ChatProps {
-  messages: MessageLog[]
+  messages: Message[]
 }
 
 const Chat = ({ messages }: ChatProps) => {
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, message: MessageLog) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, message: Message) => {
     e.dataTransfer.setData('application/json', JSON.stringify(message));
-    console.log('Draging message:', message);
   };
 
   return (
     <div>
-      {messages.map((message: MessageLog) => {
+      {messages?.map((message: Message) => {
         return (
           <div
             key={message.id}
@@ -25,7 +23,7 @@ const Chat = ({ messages }: ChatProps) => {
           >
             {message.role === 'assistant' ? <h5>GPT</h5> : <h5>User</h5>}
             {message.createdAt && <p>{new Date(message.createdAt).toLocaleString()}</p>}
-            {message.content.split('\n').map((currentTextBlock: string, index: number) => {
+            {message.content && message.content.split('\n').map((currentTextBlock: string, index: number) => {
               return <p key={message.id + index}>{currentTextBlock}</p>;
             })}
           </div>

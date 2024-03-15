@@ -1,29 +1,43 @@
 // PalContext.js
 import React, { createContext, useState } from 'react';
-import { MessageLog } from "@/types/global"
+import { ConversationWithinContext } from "@/types/global"
+import { Message } from 'ai/react'
 
 interface PalContextValue {
-    messages: MessageLog[];
-    updateMessages: (newMessages: MessageLog[]) => void;
-  }
-  
+    contextMessages: Message[];
+    updateContextMessages: (newMessages: Message[]) => void;
+    projectConversations: ConversationWithinContext[],
+    updateProjectConversations: (newMessages: ConversationWithinContext[]) => void;
+}
+
 export const PalContext = createContext<PalContextValue>({
-    messages: [],
-    updateMessages: () => {}
+    contextMessages: [],
+    updateContextMessages: () => { },
+    projectConversations: [],
+    updateProjectConversations: () => { },
 });
 
 // @ts-ignore
 export const PalProvider = ({ children }) => {
 
-    const [messages, setMessages] = useState<MessageLog[]>([]);
+    const [contextMessages, setContextMessages] = useState<Message[]>([]);
+    const [projectConversations, setProjectConversations] = useState<ConversationWithinContext[]>([]);
 
-    const [draggedMessage, setDraggedMessage] = useState<MessageLog | null>(null);
-    const updateMessages = (newMessages: MessageLog[]) => {
-        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    const updateContextMessages = (newMessages: Message[]) => {
+        setContextMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    }
+    const updateProjectConversations = (newConversations: ConversationWithinContext[]) => {
+        setProjectConversations((prevConversations) => [...prevConversations, ...newConversations]);
     }
 
     return (
-        <PalContext.Provider value={{ messages, updateMessages  }}>
+        <PalContext.Provider
+            value={{
+                contextMessages, 
+                updateContextMessages, 
+                projectConversations,
+                updateProjectConversations
+            }}>
             {children}
         </PalContext.Provider>
     );
