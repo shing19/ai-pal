@@ -54,7 +54,7 @@ const PromptContext = () => {
         }
 
         // 如果不存在对话，且是新对话，且消息长度为2，则创建新对话
-        if (!(ConversationExists()) && newConversation && thisConversationCreatedAt && ((thisMessages.length - contextMessages.length == 2))) {
+        if (!(ConversationExists()) && newConversation && thisConversationCreatedAt && ((thisMessages.length - contextMessages.length == 1))) {
             const newConversation = {
                 context: contextMessages,
                 messages: thisMessages,
