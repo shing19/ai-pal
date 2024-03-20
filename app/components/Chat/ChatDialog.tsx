@@ -2,11 +2,11 @@
 import React, { useState } from 'react'
 import { Message } from 'ai/react'
 
-interface ChatProps {
+interface ChatDialogProps {
   messages: Message[]
 }
 
-const Chat = ({ messages }: ChatProps) => {
+const ChatDialog = ({ messages }: ChatDialogProps) => {
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, message: Message) => {
     e.dataTransfer.setData('application/json', JSON.stringify(message));
@@ -33,4 +33,4 @@ const Chat = ({ messages }: ChatProps) => {
   );
 };
 
-export default Chat;
+export default ChatDialog;

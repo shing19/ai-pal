@@ -9,6 +9,7 @@ interface PalContextValue {
     projectConversations: ConversationWithinContext[],
     addProjectConversation: (newMessages: ConversationWithinContext[]) => void;
     updateProjectConversations: (updatedConversations: ConversationWithinContext[]) => void;
+    updateConversationCreatedAt: (createdAt: Date, updatedMessages: Message[]) => void;
 }
 
 export const PalContext = createContext<PalContextValue>({
@@ -16,7 +17,8 @@ export const PalContext = createContext<PalContextValue>({
     updateContextMessages: () => { },
     projectConversations: [],
     addProjectConversation: () => { },
-    updateProjectConversations: () => { }
+    updateProjectConversations: () => { },
+    updateConversationCreatedAt: () => { },
 });
 
 // @ts-ignore
@@ -36,6 +38,21 @@ export const PalProvider = ({ children }) => {
         setProjectConversations(updatedConversations);
     }
 
+    const updateConversationCreatedAt = (createdAt: Date, updatedMessages: Message[]) => {
+        const updatedConversations = projectConversations.map(conversation => {
+            if (conversation.createdAt === createdAt) {
+                if (conversation.messages !== updatedMessages) {
+                    return {
+                        ...conversation,
+                        messages: updatedMessages,
+                    };
+                }
+            }
+            return conversation
+        })
+        setProjectConversations(updatedConversations);
+    }
+
     return (
         <PalContext.Provider
             value={{
@@ -43,7 +60,8 @@ export const PalProvider = ({ children }) => {
                 updateContextMessages,
                 projectConversations,
                 addProjectConversation,
-                updateProjectConversations
+                updateProjectConversations,
+                updateConversationCreatedAt
             }}>
             {children}
         </PalContext.Provider>

@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Message } from 'ai/react'
-import Chat from './Chat'
 import { PaperPlaneIcon } from "@radix-ui/react-icons"
 import { ChatRequestOptions } from '@/types/global'
 import { useEffect, useState } from 'react'

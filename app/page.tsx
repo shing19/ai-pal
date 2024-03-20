@@ -2,7 +2,7 @@
 "use client"
 
 import PromptContext from "./components/PromptContext";
-import { PalProvider } from './components/PalContext';
+import { PalProvider } from './components/Context/PalContext';
 import ChatThreads from "./components/ChatThreads";
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
           <div className="flex-none bg-blue-300 p-2" style={{ width: 'var(--col2)' }}>
             <PromptContext />
           </div>
-          <div className="flex-grow bg-gray-300 p-2" style={{ width: 'var(--col3)' }}>
+          <div className="flex-grow bg-gray-300 p-2 overflow-y-auto" style={{ width: 'var(--col3)' }}>
             <ChatThreads />
           </div>
         </div>

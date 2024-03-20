@@ -1,16 +1,17 @@
-// Context.tsx
+// PromptContext.tsx
 import React, { use, useContext, useEffect, useState } from 'react';
-import { PalContext } from './PalContext';
+import { PalContext } from './Context/PalContext';
 import { useChat, Message } from 'ai/react'
-import Chat from './Chat';
-import ChatInput from './ChatInput'
+import ChatInput from './Chat/ChatInput'
+import ChatDialog from './Chat/ChatDialog';
 
 
 const PromptContext = () => {
-    const { contextMessages, updateContextMessages, projectConversations, addProjectConversation } = useContext(PalContext);
+    const { contextMessages, updateContextMessages, projectConversations, updateConversationCreatedAt, addProjectConversation } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat()
-    const [ newConversation , setNewConversation ] = useState<boolean>(false)
-    const [ thisMessages, setThisMessages ] = useState<Message[]>([])
+    const [newConversation, setNewConversation] = useState<boolean>(false)
+    const [thisMessages, setThisMessages] = useState<Message[]>([])
+    const [thisConversationCreatedAt, setThisConversationCreatedAt] = useState<Date>()
 
 
     // 拖拽更新 context messages
@@ -28,34 +29,47 @@ const PromptContext = () => {
         e.preventDefault();
     };
 
-
     // 处理新对话
     const handleSubmitExtended = (e: React.FormEvent<HTMLFormElement>) => {
-        setMessages([...contextMessages, ...messages]);
+        setThisMessages([])
+        const previousMessages = messages
+        const newMessages = [...contextMessages, ...messages.filter(m => !previousMessages.includes(m))];
+        setMessages(newMessages);
         handleSubmit(e);
         setNewConversation(true)
+        setThisConversationCreatedAt(new Date())
     }
 
+    // messages不变也会一直刷新，所以要过滤一下，避免陷入死循环
     useEffect(() => {
         if ((messages !== thisMessages)) {
             setThisMessages(messages)
         }
-    }, [messages, thisMessages, setThisMessages, newConversation])
+    }, [messages])
 
     useEffect(() => {
-        if ( !isLoading && newConversation && ((thisMessages.length - contextMessages.length == 2))) {
+        // 判断是否是新对话，查看projectConversations里是否有latestConversationCreatedAt
+        function ConversationExists() {
+            return projectConversations.some(conversation => conversation.createdAt === thisConversationCreatedAt)
+        }
+
+        // 如果不存在对话，且是新对话，且消息长度为2，则创建新对话
+        if (!(ConversationExists()) && newConversation && thisConversationCreatedAt && ((thisMessages.length - contextMessages.length == 2))) {
             const newConversation = {
                 context: contextMessages,
                 messages: thisMessages,
-                createdAt: new Date(),
+                createdAt: thisConversationCreatedAt,
             }
             addProjectConversation([newConversation])
             // 重置状态
-            setMessages([]) 
-            setThisMessages([])
             setNewConversation(false)
         }
-    }, [thisMessages, isLoading])
+
+        // 如果存在对话，则更新对话
+        if (ConversationExists() && thisConversationCreatedAt) {
+            updateConversationCreatedAt(thisConversationCreatedAt, thisMessages)
+        }
+    }, [thisMessages, isLoading, thisConversationCreatedAt])
 
 
     return (
@@ -65,7 +79,8 @@ const PromptContext = () => {
                 onDrop={handleDrop}
             >
                 <div>PromptContext Component</div>
-                <Chat messages={contextMessages} />
+                <ChatDialog
+                    messages={contextMessages} />
                 <ChatInput
                     input={input}
                     handleInputChange={handleInputChange}
