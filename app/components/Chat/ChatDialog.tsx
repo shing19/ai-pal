@@ -11,30 +11,32 @@ interface ChatDialogProps {
 }
 
 const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
-  const { projectConversations, updateConversationCreatedAt } = useContext(PalContext);
+  const { contextMessages, projectConversations, updateConversationCreatedAt, updateContextMessages } = useContext(PalContext);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, message: Message) => {
     e.dataTransfer.setData('application/json', JSON.stringify(message));
   };
 
+
   const handleDelete = (messageId: string) => {
     const newMessages = messages.filter(message => message.id !== messageId)
     // 在context里更新
-    if (!conversationCreatedAt) {
-      
-    }
-    // 在conversations里更新
-    projectConversations.map(conversation => {
-      if (conversation.createdAt === conversationCreatedAt) {
-        const dialogMessages = conversation.messages.filter(
-          (msg) => !conversation.context.includes(msg)
-        );
-        if (newMessages !== dialogMessages) {
-          const newMessagesWithinContext = [...conversation.context, ...newMessages];
-          updateConversationCreatedAt(conversationCreatedAt, newMessagesWithinContext)
+    if (conversationCreatedAt === undefined) {
+      updateContextMessages(newMessages)
+    } else {
+      // 在conversations里更新
+      projectConversations.map(conversation => {
+        if (conversation.createdAt === conversationCreatedAt) {
+          const dialogMessages = conversation.messages.filter(
+            (msg) => !conversation.context.includes(msg)
+          );
+          if (newMessages !== dialogMessages) {
+            const newMessagesWithinContext = [...conversation.context, ...newMessages];
+            updateConversationCreatedAt(conversationCreatedAt, newMessagesWithinContext)
+          }
         }
-      }
-    })
+      })
+    }
   };
 
   return (

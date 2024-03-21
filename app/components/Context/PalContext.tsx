@@ -5,8 +5,9 @@ import { Message } from 'ai/react'
 
 interface PalContextValue {
     contextMessages: Message[];
-    addContextMessage: (newMessages: Message[]) => void;
     projectConversations: ConversationWithinContext[],
+    addContextMessage: (newMessages: Message[]) => void;
+    updateContextMessages: (updatedMessages: Message[]) => void;
     addProjectConversation: (newMessages: ConversationWithinContext[]) => void;
     updateProjectConversations: (updatedConversations: ConversationWithinContext[]) => void;
     updateConversationCreatedAt: (createdAt: Date, updatedMessages: Message[]) => void;
@@ -14,8 +15,9 @@ interface PalContextValue {
 
 export const PalContext = createContext<PalContextValue>({
     contextMessages: [],
-    addContextMessage: () => { },
     projectConversations: [],
+    addContextMessage: () => { },
+    updateContextMessages: () => { },
     addProjectConversation: () => { },
     updateProjectConversations: () => { },
     updateConversationCreatedAt: () => { },
@@ -29,6 +31,10 @@ export const PalProvider = ({ children }) => {
 
     const addContextMessage = (newMessages: Message[]) => {
         setContextMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    }
+
+    const updateContextMessages = (updatedMessages: Message[]) => {
+        setContextMessages(updatedMessages);
     }
 
     const addProjectConversation = (newConversation: ConversationWithinContext[]) => {
@@ -58,8 +64,9 @@ export const PalProvider = ({ children }) => {
         <PalContext.Provider
             value={{
                 contextMessages,
-                addContextMessage,
                 projectConversations,
+                addContextMessage,
+                updateContextMessages,
                 addProjectConversation,
                 updateProjectConversations,
                 updateConversationCreatedAt
