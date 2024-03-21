@@ -6,7 +6,7 @@ import ChatConversation from './Chat/ChatConversation';
 
 const ChatThreads = () => {
     const { projectConversations } = useContext(PalContext);
-    const [ expandedStates, setExpandedStates ] = useState<Record<number, boolean>>({});
+    const [expandedStates, setExpandedStates] = useState<Record<number, boolean>>({});
 
     // 折叠状态管理
     useEffect(() => {
@@ -28,7 +28,13 @@ const ChatThreads = () => {
         }
     }, [projectConversations]);
 
-    const toggleExpansion = (index: number) => {
+    const toggleExpansion = (index: number, event: React.MouseEvent) => {
+        // 检查事件的目标是否属于 ChatInput 组件
+        if ((event.target as HTMLElement).closest('.chat-input-container')) {
+            // 如果是从 ChatInput 发起的点击，就停止处理
+            return;
+        }
+
         setExpandedStates(prevStates => ({
             ...prevStates,
             [index]: !prevStates[index],
@@ -39,11 +45,12 @@ const ChatThreads = () => {
         <div>
             {projectConversations?.map((conversation, index: number) => {
                 const conversationStyle = expandedStates[index] ? { height: 'auto' } : { height: '5rem', overflow: 'hidden' };
-                return (
-                    <div key={index} style={conversationStyle} onClick={() => toggleExpansion(index)}>
+                return conversation.messages.length > 0 ? (
+                    <div key={index} style={conversationStyle} onClick={(e) => toggleExpansion(index, e)}>
                         <ChatConversation conversation={conversation} />
                     </div>
-                );
+                )
+                    : null
             })}
         </div>
     );

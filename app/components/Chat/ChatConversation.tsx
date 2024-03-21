@@ -1,3 +1,4 @@
+// ChatConversation.tsx
 import { ConversationWithinContext } from '@/types/global';
 import React, { useContext, useEffect, useState } from 'react'
 import ChatInput from './ChatInput';
@@ -68,14 +69,21 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
 
     return (
         <div>
-            <ChatDialog
-                messages={displayMessages} />
-            <ChatInput
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={handleSubmitExtended}
-                isLoading={isLoading}
-                messages={messages} />
+            {displayMessages.length > 0 &&
+                <div>
+                    <ChatDialog
+                        messages={displayMessages}
+                        conversationCreatedAt={conversation.createdAt}
+                    />
+
+                    <ChatInput
+                        input={input}
+                        handleInputChange={handleInputChange}
+                        handleSubmit={handleSubmitExtended}
+                        isLoading={isLoading}
+                        messages={messages} />
+                </div>
+            }
         </div>
     )
 }

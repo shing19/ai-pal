@@ -7,7 +7,7 @@ import ChatDialog from './Chat/ChatDialog';
 
 
 const PromptContext = () => {
-    const { contextMessages, updateContextMessages, projectConversations, updateConversationCreatedAt, addProjectConversation } = useContext(PalContext);
+    const { contextMessages, addContextMessage, projectConversations, updateConversationCreatedAt, addProjectConversation } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat()
     const [newConversation, setNewConversation] = useState<boolean>(false)
     const [thisMessages, setThisMessages] = useState<Message[]>([])
@@ -21,7 +21,7 @@ const PromptContext = () => {
         const droppedMessage = transferMessage ? JSON.parse(transferMessage) : null;
         // 如果消息存在且不在当前消息列表中,则更新消息列表
         if (droppedMessage && !contextMessages.find(m => m.id === droppedMessage.id)) {
-            updateContextMessages([droppedMessage]);
+            addContextMessage([droppedMessage]);
         }
     };
 
@@ -80,7 +80,9 @@ const PromptContext = () => {
             >
                 <div>PromptContext Component</div>
                 <ChatDialog
-                    messages={contextMessages} />
+                    messages={contextMessages}
+                    conversationCreatedAt={undefined}
+                />
                 <ChatInput
                     input={input}
                     handleInputChange={handleInputChange}

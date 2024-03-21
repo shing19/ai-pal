@@ -30,18 +30,22 @@ const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleS
     }, [input])
 
     return (
-        <div>
+        <div className="chat-input-container">
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingBottom: '3rem' }}>
                 <p>user message</p>
                 <Textarea
                     placeholder='input something'
                     value={input}
-                    onChange={handleInputChange}
-                    onKeyDown={e => {
+                    onChange={(e) => {
+                        handleInputChange(e);
+                        e.stopPropagation(); // 阻止事件冒泡
+                    }}
+                    onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault()
-                            // @ts-ignore
-                            handleSubmit(e)
+                            e.preventDefault();
+                            //@ts-ignore
+                            handleSubmit(e);
+                            e.stopPropagation(); // 阻止事件冒泡
                         }
                     }}
                     style={{ display: 'flex', alignItems: 'center', height: inputHeight }}
