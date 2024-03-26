@@ -5,6 +5,8 @@ import ChatInput from './ChatInput';
 import { Message, useChat } from 'ai/react';
 import { PalContext } from '../Context/PalContext';
 import ChatDialog from './ChatDialog';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { Button } from '@/components/ui/button';
 
 
 interface ChatConversationProps {
@@ -41,7 +43,7 @@ function mergeAndSort(a: Message[], b: Message[]): Message[] {
 }
 
 const ChatConversation = ({ conversation }: ChatConversationProps) => {
-    const { projectConversations, updateConversationCreatedAt } = useContext(PalContext);
+    const { projectConversations, updateConversationCreatedAt, updateProjectConversations } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat();
     const [thisMessages, setThisMessages] = useState<Message[]>([]);
 
@@ -67,6 +69,11 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
     }, [messages])
 
 
+    const handleDelete = (createdAt: Date) => {
+        const updatedConversations = projectConversations.filter(conversation => conversation.createdAt !== createdAt);
+        updateProjectConversations(updatedConversations);
+    }
+
     return (
         <div>
             {displayMessages.length > 0 &&
@@ -75,13 +82,19 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
                         messages={displayMessages}
                         conversationCreatedAt={conversation.createdAt}
                     />
-
                     <ChatInput
                         input={input}
                         handleInputChange={handleInputChange}
                         handleSubmit={handleSubmitExtended}
                         isLoading={isLoading}
                         messages={messages} />
+                    {conversation.createdAt !== undefined &&
+                        <div>
+                            <Button variant="outline" size="icon" className='h-5 w-12' onClick={() => handleDelete(conversation.createdAt)}>
+                                <Cross2Icon className="h-3 w-3" /> 删除对话
+                            </Button>
+                        </div>
+                    }
                 </div>
             }
         </div>
