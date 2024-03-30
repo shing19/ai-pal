@@ -37,7 +37,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleS
                     handleSubmit(e);
                 }
             }} style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingBottom: '3rem' }}>
-                <p>user message</p>
                 <Textarea
                     placeholder='input something'
                     value={input}

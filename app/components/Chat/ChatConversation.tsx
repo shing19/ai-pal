@@ -7,6 +7,7 @@ import { PalContext } from '../Context/PalContext';
 import ChatDialog from './ChatDialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 
 interface ChatConversationProps {
@@ -77,25 +78,29 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
     return (
         <div>
             {displayMessages.length > 0 &&
-                <div>
-                    <ChatDialog
-                        messages={displayMessages}
-                        conversationCreatedAt={conversation.createdAt}
-                    />
-                    <ChatInput
-                        input={input}
-                        handleInputChange={handleInputChange}
-                        handleSubmit={handleSubmitExtended}
-                        isLoading={isLoading}
-                        messages={messages} />
-                    {conversation.createdAt !== undefined &&
-                        <div>
-                            <Button variant="outline" size="icon" className='h-5 w-12' onClick={() => handleDelete(conversation.createdAt)}>
-                                <Cross2Icon className="h-3 w-3" /> 删除对话
-                            </Button>
+                <Card>
+                    <CardContent>
+                        <div className='flex-col space-y-2 my-6'>
+                            <ChatDialog
+                                messages={displayMessages}
+                                conversationCreatedAt={conversation.createdAt}
+                            />
+                            <ChatInput
+                                input={input}
+                                handleInputChange={handleInputChange}
+                                handleSubmit={handleSubmitExtended}
+                                isLoading={isLoading}
+                                messages={messages} />
+                            {conversation.createdAt !== undefined &&
+                                <div>
+                                    <Button variant="outline" onClick={() => handleDelete(conversation.createdAt)}>
+                                        删除对话
+                                    </Button>
+                                </div>
+                            }
                         </div>
-                    }
-                </div>
+                    </CardContent>
+                </Card>
             }
         </div>
     )

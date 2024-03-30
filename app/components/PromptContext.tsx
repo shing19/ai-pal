@@ -4,6 +4,7 @@ import { PalContext } from './Context/PalContext';
 import { useChat, Message } from 'ai/react'
 import ChatInput from './Chat/ChatInput'
 import ChatDialog from './Chat/ChatDialog';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 
 const PromptContext = () => {
@@ -78,17 +79,21 @@ const PromptContext = () => {
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
             >
-                <div>PromptContext Component</div>
-                <ChatDialog
-                    messages={contextMessages}
-                    conversationCreatedAt={undefined}
-                />
-                <ChatInput
-                    input={input}
-                    handleInputChange={handleInputChange}
-                    handleSubmit={handleSubmitExtended}
-                    isLoading={isLoading}
-                    messages={messages} />
+                <Card>
+                    <CardHeader>PromptContext Component</CardHeader>
+                    <CardContent>
+                        <ChatDialog
+                            messages={contextMessages}
+                            conversationCreatedAt={undefined}
+                        />
+                        <ChatInput
+                            input={input}
+                            handleInputChange={handleInputChange}
+                            handleSubmit={handleSubmitExtended}
+                            isLoading={isLoading}
+                            messages={messages} />
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
