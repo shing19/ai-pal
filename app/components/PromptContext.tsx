@@ -2,18 +2,31 @@
 import React, { use, useContext, useEffect, useState } from 'react';
 import { PalContext } from './Context/PalContext';
 import { useChat, Message } from 'ai/react'
-import ChatInput from './Chat/ChatInput'
-import ChatDialog from './Chat/ChatDialog';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import ChatDialog from './Chat/ChatDialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { PaperPlaneIcon } from "@radix-ui/react-icons"
 
 
 const PromptContext = () => {
     const { contextMessages, addContextMessage, projectConversations, updateConversationCreatedAt, addProjectConversation } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat()
-    const [newConversation, setNewConversation] = useState<boolean>(false)
-    const [thisMessages, setThisMessages] = useState<Message[]>([])
-    const [thisConversationCreatedAt, setThisConversationCreatedAt] = useState<Date>()
+    const [ newConversation, setNewConversation ] = useState<boolean>(false)
+    const [ thisMessages, setThisMessages ] = useState<Message[]>([])
+    const [ thisConversationCreatedAt, setThisConversationCreatedAt ] = useState<Date>()
 
+
+    // input text area
+    const [inputHeight, setInputHeight] = useState('auto');
+    const [isComposing, setIsComposing] = useState(false); // 添加状态跟踪是否处于组合输入模式
+    useEffect(() => {
+        if (input.length > 80 || /\n{2,}/.test(input)) {
+            setInputHeight('7rem')
+        } else {
+            setInputHeight('2rem')
+        }
+    }, [input])
 
     // 拖拽更新 context messages
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -36,7 +49,11 @@ const PromptContext = () => {
         const previousMessages = messages
         const newMessages = [...contextMessages, ...messages.filter(m => !previousMessages.includes(m))];
         setMessages(newMessages);
-        handleSubmit(e);
+        handleSubmit(e, {
+            data: {
+                context: JSON.stringify(contextMessages)
+            },
+        });
         setNewConversation(true)
         setThisConversationCreatedAt(new Date())
     }
@@ -53,7 +70,6 @@ const PromptContext = () => {
         function ConversationExists() {
             return projectConversations.some(conversation => conversation.createdAt === thisConversationCreatedAt)
         }
-
         // 如果不存在对话，且是新对话，且消息长度为2，则创建新对话
         if (!(ConversationExists()) && newConversation && thisConversationCreatedAt && ((thisMessages.length - contextMessages.length == 1))) {
             const newConversation = {
@@ -86,12 +102,46 @@ const PromptContext = () => {
                             messages={contextMessages}
                             conversationCreatedAt={undefined}
                         />
-                        <ChatInput
-                            input={input}
-                            handleInputChange={handleInputChange}
-                            handleSubmit={handleSubmitExtended}
-                            isLoading={isLoading}
-                            messages={messages} />
+                        {/* 这里可能会修改，不一定有这样固定的输入部分 */}
+                        <form onSubmit={(e) => {
+                            e.preventDefault(); // 防止默认提交行为
+                            if (!isComposing) { // 当不处于组合输入状态时才处理提交
+                                handleSubmitExtended(e)
+                            }
+                        }} style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingBottom: '3rem' }}>
+                            <Textarea
+                                placeholder='Say something...'
+                                value={input}
+                                onChange={(e) => {
+                                    handleInputChange(e);
+                                    e.stopPropagation(); // 阻止事件冒泡
+                                }}
+                                onCompositionStart={() => setIsComposing(true)} // 开始组合输入
+                                onCompositionEnd={() => setIsComposing(false)} // 结束组合输入
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+                                        e.preventDefault();
+                                        // @ts-ignore
+                                        handleSubmitExtended(e);
+                                        e.stopPropagation(); // 阻止事件冒泡
+                                    }
+                                }}
+                                style={{ display: 'flex', alignItems: 'center', height: inputHeight }}
+                            />
+                            <Button
+                                type="submit"
+                                variant="ghost"
+                                size='icon'
+                                disabled={isLoading} // 根据isLoading状态禁用按钮
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '0.5rem', // 调整按钮距离底部的距离
+                                    right: '0rem', // 调整按钮距离右侧的距离
+                                }}
+                            >
+                                <PaperPlaneIcon />
+                            </Button>
+                        </form>
                     </CardContent>
                 </Card>
             </div>

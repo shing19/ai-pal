@@ -46,19 +46,34 @@ export const PalProvider = ({ children }) => {
     }
 
     const updateConversationCreatedAt = (createdAt: Date, updatedMessages: Message[]) => {
+        // 去重加入流式更新的新消息
         const updatedConversations = projectConversations.map(conversation => {
             if (conversation.createdAt === createdAt) {
-                if (conversation.messages !== updatedMessages) {
-                    return {
-                        ...conversation,
-                        messages: updatedMessages,
-                    };
-                }
+                let updatedMessagesList = conversation.messages.map(message => ({ ...message }));
+                updatedMessages.forEach(newMessage => {
+                    const existingMessageIndex = updatedMessagesList.findIndex(
+                        message => message.id === newMessage.id
+                    );
+                    if (existingMessageIndex !== -1) {
+                        const existingMessage = updatedMessagesList[existingMessageIndex];
+                        if (existingMessage.content !== newMessage.content) {
+                            // 如果内容不同，则替换消息
+                            updatedMessagesList[existingMessageIndex] = newMessage;
+                        }
+                    } else {
+                        // 如果没有找到具有相同 id 的消息，则添加新消息到会话消息数组中
+                        updatedMessagesList.push(newMessage);
+                    }
+                });
+                return {
+                    ...conversation,
+                    messages: updatedMessagesList,
+                };
             }
-            return conversation
-        })
+            return conversation;
+        });
         setProjectConversations(updatedConversations);
-    }
+    };
 
     return (
         <PalContext.Provider

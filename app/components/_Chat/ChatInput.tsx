@@ -2,8 +2,8 @@
 "use client"
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Message } from 'ai/react'
 import { PaperPlaneIcon } from "@radix-ui/react-icons"
+import { Message } from 'ai/react'
 import { ChatRequestOptions } from '@/types/global'
 import { useEffect, useState } from 'react'
 
@@ -13,12 +13,15 @@ interface ChatInputProps {
     handleSubmit: (e: React.FormEvent<HTMLFormElement>, chatRequestOptions?: ChatRequestOptions) => void;
     isLoading: boolean;
     messages: Message[];
+    contextMessages: Message[];
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleSubmit, isLoading, messages }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleSubmit, isLoading, messages, contextMessages }) => {
 
     const [inputHeight, setInputHeight] = useState('auto');
     const [isComposing, setIsComposing] = useState(false); // 添加状态跟踪是否处于组合输入模式
+
+    console.log(messages)
 
     // 处理灵活的input高度
     useEffect(() => {
@@ -50,7 +53,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ input, handleInputChange, handleS
                         if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
                             e.preventDefault();
                             // @ts-ignore
-                            handleSubmit(e);
+                            handleSubmit(e, { contextMessages });
                             e.stopPropagation(); // 阻止事件冒泡
                         }
                     }}

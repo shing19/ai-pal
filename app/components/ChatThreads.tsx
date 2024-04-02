@@ -2,7 +2,7 @@
 "use client"
 import { useContext, useEffect, useState } from 'react';
 import { PalContext } from './Context/PalContext';
-import ChatConversation from './Chat/ChatConversation';
+import ChatConversation from './Chat/Conversation';
 
 const ChatThreads = () => {
     const { projectConversations } = useContext(PalContext);
