@@ -18,6 +18,13 @@ export async function POST(request: Request) {
     const { messages, data } = await request.json()
     const contextMessages = data?.context ? JSON.parse(data.context) : []
     const conversationMessages = data?.conversationMessages ? JSON.parse(data.conversationMessages) : []
+    // debug用
+    // console.log("contextMessages:")
+    // console.log(contextMessages)
+    // console.log("conversationMessages:")
+    // console.log(conversationMessages)
+    // console.log("messages:")
+    // console.log(messages)
     let mergedMessages = [
         ...contextMessages,
         ...conversationMessages
@@ -27,16 +34,21 @@ export async function POST(request: Request) {
     });
     // 只保留 role 和 content 属性
     mergedMessages = mergedMessages.map(({ role, content }) => ({ role, content }))
-    // 和 messages 去重
-    const uniqueMessagesArray = new Set([
-        ...mergedMessages,
-        ...messages
-    ]);
-    const uniqueMessages = Array.from(uniqueMessagesArray);
-
-    // 留着 debug 用
-    console.log("this conversation:")
-    console.log(uniqueMessages)
+    console.log("mergedMessages:")
+    console.log(mergedMessages)
+    // 当从conversation传进来时，message会和context重叠一部分，所以需要去重
+    let remainingMessages = [];
+    for (let i = 0; i < messages.length; i++) {
+        if (i < mergedMessages.length && messages[i].role === mergedMessages[i].role && messages[i].content === mergedMessages[i].content) {
+            continue;
+        } else {
+            remainingMessages.push(messages[i]);
+        }
+    }
+    const uniqueMessages = [...mergedMessages, ...remainingMessages];
+    // debug 用
+    // console.log("this conversation:")
+    // console.log(uniqueMessages)
 
     try {
         const response = await openai.chat.completions.create({

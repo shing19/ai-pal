@@ -72,6 +72,7 @@ export const PalProvider = ({ children }) => {
             }
             return conversation;
         });
+        console.log('updatedConversations', updatedConversations)
         setProjectConversations(updatedConversations);
     };
 

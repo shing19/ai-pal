@@ -82,7 +82,6 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
     useEffect(() => {
         // 更新到 project conversations 里
         if (conversation.createdAt) {
-            console.log(messages)
             updateConversationCreatedAt(conversation.createdAt, messages);
         }
     }, [messages])

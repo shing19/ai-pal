@@ -20,11 +20,13 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
     const { contextMessages, projectConversations, updateConversationCreatedAt, updateContextMessages } = useContext(PalContext);
     const [showDeleteButtons, setShowDeleteButtons] = useState<ShowDeleteButtonsState>({});
 
+    // 拖拽事件
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, message: Message) => {
         e.dataTransfer.setData('application/json', JSON.stringify(message));
     };
 
 
+    // 删除对话（仅作用在context里）
     const toggleDeleteButton = (messageId: string) => {
         setShowDeleteButtons((prevState: ShowDeleteButtonsState) => ({
             ...prevState,
@@ -54,9 +56,21 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
         }
     };
 
+    // 在display conversation的时候，不显示context message
+    let displayMessages = messages;
+    if (conversationCreatedAt !== undefined) {
+        projectConversations.map(conversation => {
+            if (conversation.createdAt === conversationCreatedAt) {
+                displayMessages = conversation.messages.filter(
+                    (msg) => !conversation.context.some(ctx => ctx.id === msg.id)
+                );
+            }
+        })
+    }
+
     return (
         <div>
-            {messages.length > 0 && messages.map((message) => {
+            {displayMessages.length > 0 && displayMessages.map((message) => {
                 const showDeleteButton = showDeleteButtons[message.id] || false;
 
                 return (
