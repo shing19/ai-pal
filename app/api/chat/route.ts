@@ -10,8 +10,8 @@ export const runtime = 'edge'
 // });
 
 const openai = new OpenAI({
-    apiKey: process.env.MOONSHOT_API_KEY,
-    baseURL: process.env.MOONSHOT_BASE_URL
+    apiKey: process.env.API_KEY,
+    baseURL: process.env.BASE_URL
 });
 
 export async function POST(request: Request) {
@@ -40,8 +40,8 @@ export async function POST(request: Request) {
 
     try {
         const response = await openai.chat.completions.create({
-            // model: 'gpt-3.5-turbo',
-            model: "moonshot-v1-8k",
+            model: process.env.MODEL || "",
+            // model: "moonshot-v1-8k",
             messages: [
                 { role: "system", content: "You are a helpful assistant." },
                 ...mergedMessages,
