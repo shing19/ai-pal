@@ -34,8 +34,9 @@ export async function POST(request: Request) {
     });
     // 只保留 role 和 content 属性
     mergedMessages = mergedMessages.map(({ role, content }) => ({ role, content }))
-    console.log("mergedMessages:")
-    console.log(mergedMessages)
+    // debug用
+    // console.log("mergedMessages:")
+    // console.log(mergedMessages)
     // 当从conversation传进来时，message会和context重叠一部分，所以需要去重
     let remainingMessages = [];
     for (let i = 0; i < messages.length; i++) {
