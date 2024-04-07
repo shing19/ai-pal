@@ -42,9 +42,10 @@ const ChatThreads = () => {
     };
 
     return (
-        <div>
+        <div className='flex flex-col gap-y-1'>
             {projectConversations?.map((conversation, index: number) => {
-                const conversationStyle = expandedStates[index] ? { height: 'auto' } : { height: '5rem', overflow: 'hidden' };
+                const conversationStyle = expandedStates[index] ? { height: 'auto', transition: '' } : { height: '5rem', overflow: 'hidden', borderRadius: '0.75rem', transition: ''};
+                conversationStyle.transition = 'height 0.8s ease-in-out';
                 return conversation.messages.length > 0 ? (
                     <div key={index} style={conversationStyle} onClick={(e) => toggleExpansion(index, e)}>
                         <ChatConversation conversation={conversation} />

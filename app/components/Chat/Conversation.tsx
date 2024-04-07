@@ -138,7 +138,10 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
                     </form>
                     {conversation.createdAt !== undefined &&
                         <div>
-                            <Button variant="outline" onClick={() => handleDelete(conversation.createdAt)}>
+                            <Button variant="outline" onClick={(event) => {
+                                event.stopPropagation();
+                                handleDelete(conversation.createdAt)
+                            }}>
                                 删除对话
                             </Button>
                         </div>
