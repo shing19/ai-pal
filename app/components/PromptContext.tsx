@@ -6,15 +6,20 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ChatDialog from './Chat/ChatDialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { PaperPlaneIcon } from "@radix-ui/react-icons"
+import { CheckIcon, Cross2Icon, PaperPlaneIcon } from "@radix-ui/react-icons"
+import { nanoid } from 'ai';
 
 
 const PromptContext = () => {
-    const { contextMessages, addContextMessage, projectConversations, updateConversationCreatedAt, addProjectConversation } = useContext(PalContext);
+    const { contextMessages, addContextMessage, projectConversations, updateConversationCreatedAt, addProjectConversation, updateContextMessages } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat()
-    const [ newConversation, setNewConversation ] = useState<boolean>(false)
-    const [ thisMessages, setThisMessages ] = useState<Message[]>([])
-    const [ thisConversationCreatedAt, setThisConversationCreatedAt ] = useState<Date>()
+    const [newConversation, setNewConversation] = useState<boolean>(false)
+    const [thisMessages, setThisMessages] = useState<Message[]>([])
+    const [thisConversationCreatedAt, setThisConversationCreatedAt] = useState<Date>()
+    const [newMessage, setNewMessage] = useState<Message[]>([])
+    const [newContent, setNewContent] = useState<string>('')
+    const [isAdding, setIsAdding] = useState<boolean>(false)
+    const [newMeesageId, setNewMessageId] = useState<string>('')
 
 
     // input text area
@@ -27,6 +32,7 @@ const PromptContext = () => {
             setInputHeight('2rem')
         }
     }, [input])
+
 
     // 拖拽更新 context messages
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -43,12 +49,13 @@ const PromptContext = () => {
         e.preventDefault();
     };
 
+
     // 处理新对话
     const handleSubmitExtended = (e: React.FormEvent<HTMLFormElement>) => {
         setThisMessages([])
         const previousMessages = messages
-        const newMessages = [...contextMessages, ...messages.filter(m => !previousMessages.includes(m))];
-        setMessages(newMessages);
+        const newMessage = [...contextMessages, ...messages.filter(m => !previousMessages.includes(m))];
+        setMessages(newMessage);
         handleSubmit(e, {
             data: {
                 context: JSON.stringify(contextMessages)
@@ -88,6 +95,22 @@ const PromptContext = () => {
         }
     }, [thisMessages, isLoading, thisConversationCreatedAt])
 
+    // console.log('contextMessages', contextMessages)
+
+    // 添加消息
+    const handleSave = () => {
+        const id = nanoid()
+
+        // 添加消息
+        addContextMessage([{
+            createdAt: new Date(),
+            content: newContent,
+            role: "user",
+            id: id
+        }])
+        setIsAdding(false)
+        setNewContent('')
+    }
 
     return (
         <div className='h-full'>
@@ -102,6 +125,36 @@ const PromptContext = () => {
                             messages={contextMessages}
                             conversationCreatedAt={undefined}
                         />
+                        {isAdding &&
+                            <div className='flex flex-col space-y-2 items-center'>
+                                <textarea
+                                    value={newContent}
+                                    onChange={(e) => setNewContent(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        // Check if 'Enter' is pressed without the 'Shift' key
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault(); // Prevents adding a new line
+                                            handleSave(); // Call the save handler
+                                        }
+                                    }}
+                                    className="w-full h-auto rounded"
+                                    style={{ resize: 'none' }}
+                                >
+                                </textarea>
+                                <div className='flex space-x-2'>
+                                    <Button variant="outline" size="icon" className="h-5 w-5" onClick={() => handleSave()}>
+                                        <CheckIcon className="h-3 w-3" />
+                                    </Button>
+                                    <Button variant="outline" size="icon" className="h-5 w-5" onClick={() => setIsAdding(false)}>
+                                        <Cross2Icon className="h-3 w-3" />
+                                    </Button>
+
+                                </div>
+                            </div>
+                        }
+                        <Button onClick={() => setIsAdding(true)}>
+                            新增消息
+                        </Button>
                         {/* 这里可能会修改，不一定有这样固定的输入部分 */}
                         <form onSubmit={(e) => {
                             e.preventDefault(); // 防止默认提交行为

@@ -26,6 +26,7 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [edieState, setEditState] = useState<editState>({});
     const [newContent, setNewContent] = useState('');
+    const [dragOverId, setDragOverId] = useState<string>('');
 
     // 拖拽事件
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, message: Message) => {
@@ -52,10 +53,10 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
                     const dialogMessages = conversation.messages.filter(
                         (msg) => !conversation.context.includes(msg)
                     );
-                    console.log('dialogMessages', dialogMessages)
+                    // console.log('dialogMessages', dialogMessages)
                     if (newMessages !== dialogMessages) {
                         const newMessagesWithinContext = [...conversation.context, ...newMessages];
-                        console.log('newMessagesWithinContext', newMessagesWithinContext)
+                        // console.log('newMessagesWithinContext', newMessagesWithinContext)
                         updateConversationCreatedAt(conversationCreatedAt, newMessagesWithinContext)
                     }
                 }
@@ -105,6 +106,34 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
         })
     }
 
+
+    // 拖拽事件
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>, messageId: string) => {
+        e.preventDefault();
+        setDragOverId(messageId); // 设置当前hover的消息的id
+    };
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const transferMessage = e.dataTransfer.getData('application/json');
+        const droppedMessage = transferMessage ? JSON.parse(transferMessage) : null;
+        // 如果消息存在且在当前消息列表中，则更新消息列表
+        if (droppedMessage) {
+            const foundIndex = contextMessages.findIndex(m => m.id === droppedMessage.id);
+            if (foundIndex !== -1) {
+                // 从现有数组中移除这个元素
+                const newMessages = [...contextMessages];
+                newMessages.splice(foundIndex, 1);
+                // 在新的位置插入这个元素
+                const dropAtIndex = contextMessages.findIndex(m => m.id === dragOverId);
+                newMessages.splice(dropAtIndex, 0, droppedMessage);
+                // console.log('newMessages', newMessages)
+                // 更新contextMessages
+                updateContextMessages(newMessages);
+            }
+        }
+    };
+
+
     return (
         <div>
             {displayMessages.length > 0 && displayMessages.map((message) => {
@@ -116,6 +145,10 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
                         className="mt-2"
                         onMouseEnter={() => toggleDeleteButton(message.id)}
                         onMouseLeave={() => toggleDeleteButton(message.id)}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, message)}
+                        onDragOver={(e) => handleDragOver(e, message.id)} // 添加 onDragOver 事件
+                        onDrop={handleDrop}  // 添加 onDrop 事件
                     >
                         <div
                             className='flex justify-between h-6'
@@ -143,6 +176,13 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
                                     <textarea
                                         value={newContent}
                                         onChange={(e) => setNewContent(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            // Check if 'Enter' is pressed without the 'Shift' key
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault(); // Prevents adding a new line
+                                                handleSave(message.id); // Call the save handler
+                                            }
+                                        }}
                                         className="w-full h-auto border-none outline-none rounded"
                                         style={{ resize: 'none' }}
                                     >
@@ -169,7 +209,7 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
                     </div>
                 );
             })}
-        </div>
+        </div >
     );
 };
 

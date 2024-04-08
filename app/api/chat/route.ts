@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const { messages, data } = await request.json()
     const contextMessages = data?.context ? JSON.parse(data.context) : []
     const conversationMessages = data?.conversationMessages ? JSON.parse(data.conversationMessages) : []
-    // debug用
+    // debug: 收到各路消息去重
     // console.log("contextMessages:")
     // console.log(contextMessages)
     // console.log("conversationMessages:")
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     });
     // 只保留 role 和 content 属性
     mergedMessages = mergedMessages.map(({ role, content }) => ({ role, content }))
-    // debug用
+    // debug: 去重且合并后的消息
     // console.log("mergedMessages:")
     // console.log(mergedMessages)
     // 当从conversation传进来时，message会和context重叠一部分，所以需要去重
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
         }
     }
     const uniqueMessages = [...mergedMessages, ...remainingMessages];
-    // debug 用
+    // debug: 最后传给模型的消息
     // console.log("this conversation:")
     // console.log(uniqueMessages)
 
