@@ -18,8 +18,7 @@ interface PalContextValue {
 const getProjects = (): Project[] => {
     if (!localStorage) return [];
     const projects = localStorage.getItem('projects');
-    // 按照createdAt排序，靠近现在的排前面
-    return projects ? JSON.parse(projects).sort((a: Project, b: Project) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
+    return projects ? JSON.parse(projects) : [];
 }
 
 
@@ -48,6 +47,7 @@ export const PalProvider = ({ children }) => {
                 setProjectConversations(selectedProject.conversations);
             }
         }
+        setProjects(getProjects());
     }, [projectId]);
 
 

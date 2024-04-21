@@ -19,21 +19,20 @@ const NavBar = () => {
 
     useEffect(() => {
         if (!visitProjectId && projects.length > 0) {
-            router.push(`/?projectId=${projects[0].id}`)    // 如果没有projectId，跳转到第一个项目，保证有projectId
+            router.replace(`/?projectId=${projects[0].id}`)    // 如果没有projectId，跳转到第一个项目，保证有projectId
         } 
+        const projectsFromStorage = getProjects();
+        const selectedProjectFromStorage = projectsFromStorage.find(project => project.id === visitProjectId);
         if (visitProjectId && projects.length > 0) {
             const selectedProject = projects.find(project => project.id === visitProjectId);
             if (!selectedProject) {
                 // if cannot find the id in hte projects, get projects from local storage to check if the id exists
-                const projectsFromStorage = getProjects();
-                const selectedProjectFromStorage = projectsFromStorage.find(project => project.id === visitProjectId);
                 if (selectedProjectFromStorage) {
                     setProjects(projectsFromStorage);
                 } else {
-                    router.push(`/?projectId=${projects[0].id}`)    // 如果projectId不存在，跳转到第一个项目
+                    router.replace(`/?projectId=${projects[0].id}`)    // 说明projectId不存在，跳转到第一个项目
                 }
             }
-
         }
     }, [visitProjectId, projects]);
 
@@ -47,20 +46,22 @@ const NavBar = () => {
             context: [],
             conversations: []
         }
+        const updatedProjects = [newProject, ...getProjects()];
         //@ts-ignore
-        localStorage.setItem('projects', JSON.stringify([newProject, ...projects]))
-        router.push(`/?projectId=${newProject.id}`)
+        localStorage.setItem('projects', JSON.stringify(updatedProjects))
+        router.replace(`/?projectId=${newProject.id}`)
     }
 
     // 删除项目，保存到浏览器缓存
     function handleDeleteProject(id: string) {
         return () => {
-            const newProjects = projects.filter(project => project.id !== id)
-            setProjects(newProjects)
+            const nowProjects = getProjects();
+            const newProjects = nowProjects.filter(project => project.id !== id)
             //@ts-ignore
             localStorage.setItem('projects', JSON.stringify(newProjects))
-            if (visitProjectId === id) {
-                router.push(`/?projectId=${newProjects[0].id}`)
+            setProjects(newProjects)
+            if (visitProjectId === id && newProjects.length > 0) {
+                router.replace(`/?projectId=${newProjects[0].id}`)
             }
         }
     }

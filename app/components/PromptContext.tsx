@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { CheckIcon, Cross2Icon, PaperPlaneIcon } from "@radix-ui/react-icons"
 import { nanoid } from 'ai';
+import { useSearchParams } from 'next/navigation';
 
 
 const PromptContext = () => {
@@ -20,7 +21,16 @@ const PromptContext = () => {
     const [newContent, setNewContent] = useState<string>('')
     const [isAdding, setIsAdding] = useState<boolean>(false)
     const [newMeesageId, setNewMessageId] = useState<string>('')
+    const [projectId, setProjectId] = useState<string>('')
+    const visitProjectId = useSearchParams().get('projectId')
 
+    useEffect(() => {
+        if (visitProjectId && visitProjectId !== projectId) {
+            const projectId = visitProjectId
+            setProjectId(projectId)
+            // 更新contextMessages
+        }
+    }, [visitProjectId])
 
     // input text area
     const [inputHeight, setInputHeight] = useState('auto');
