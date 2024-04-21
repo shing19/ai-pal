@@ -8,8 +8,8 @@ interface ConversationWithinContext {
 }
 
 interface Project {
-  projectId: string;
-  projectName: string;
+  id: string;
+  name: string;
   createdAt: Date;
   lastEditedAt: Date;
   context: Message[];

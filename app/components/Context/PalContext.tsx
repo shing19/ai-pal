@@ -1,7 +1,8 @@
 // PalContext.js
-import React, { createContext, useState } from 'react';
-import { ConversationWithinContext } from "@/types/global"
+import React, { createContext, use, useEffect, useState } from 'react';
+import { ConversationWithinContext, Project } from "@/types/global"
 import { Message } from 'ai/react'
+import { useSearchParams } from 'next/navigation';
 
 interface PalContextValue {
     contextMessages: Message[];
@@ -12,6 +13,15 @@ interface PalContextValue {
     updateProjectConversations: (updatedConversations: ConversationWithinContext[]) => void;
     updateConversationCreatedAt: (createdAt: Date, updatedMessages: Message[]) => void;
 }
+
+
+const getProjects = (): Project[] => {
+    if (!localStorage) return [];
+    const projects = localStorage.getItem('projects');
+    // 按照createdAt排序，靠近现在的排前面
+    return projects ? JSON.parse(projects).sort((a: Project, b: Project) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
+}
+
 
 export const PalContext = createContext<PalContextValue>({
     contextMessages: [],
@@ -25,24 +35,88 @@ export const PalContext = createContext<PalContextValue>({
 
 // @ts-ignore
 export const PalProvider = ({ children }) => {
-
+    const projectId = useSearchParams().get('projectId');
     const [contextMessages, setContextMessages] = useState<Message[]>([]);
     const [projectConversations, setProjectConversations] = useState<ConversationWithinContext[]>([]);
+    const [projects, setProjects] = useState<Project[]>(() => getProjects());
+
+    useEffect(() => {
+        if (projectId) {
+            const selectedProject = getProjects().find(project => project.id === projectId);
+            if (selectedProject) {
+                setContextMessages(selectedProject.context);
+                setProjectConversations(selectedProject.conversations);
+            }
+        }
+    }, [projectId]);
+
 
     const addContextMessage = (newMessages: Message[]) => {
         setContextMessages((prevMessages) => [...prevMessages, ...newMessages]);
+        // 写进浏览器缓存里
+        const updatedProject = projects.map(project => {
+            if (project.id === projectId) {
+                return {
+                    ...project,
+                    context: [...project.context, ...newMessages]
+                }
+            }
+            return project;
+        });
+        //@ts-ignore
+        localStorage.setItem('projects', JSON.stringify(updatedProject));
+        setProjects(updatedProject);
     }
 
     const updateContextMessages = (updatedMessages: Message[]) => {
         setContextMessages(updatedMessages);
+        // 写进浏览器缓存里
+        const updatedProject = projects.map(project => {
+            if (project.id === projectId) {
+                return {
+                    ...project,
+                    context: updatedMessages
+                }
+            }
+            return project;
+        });
+        //@ts-ignore
+        localStorage.setItem('projects', JSON.stringify(updatedProject));
+        setProjects(updatedProject);
     }
 
     const addProjectConversation = (newConversation: ConversationWithinContext[]) => {
         setProjectConversations((prevConversations) => [...prevConversations, ...newConversation]);
+        // 写进浏览器缓存里
+        const updatedProject = projects.map(project => {
+            if (project.id === projectId) {
+                return {
+                    ...project,
+                    conversations: [...project.conversations, ...newConversation]
+                }
+            }
+            return project;
+        });
+        //@ts-ignore
+        localStorage.setItem('projects', JSON.stringify(updatedProject));
+        setProjects(updatedProject);
     }
 
     const updateProjectConversations = (updatedConversations: ConversationWithinContext[]) => {
         setProjectConversations(updatedConversations);
+        // 写进浏览器缓存里
+        const updatedProject = projects.map(project => {
+            if (project.id === projectId) {
+                return {
+                    ...project,
+                    conversations: updatedConversations
+                }
+            }
+            return project;
+        });
+        //@ts-ignore
+        localStorage.setItem('projects', JSON.stringify(updatedProject));
+        setProjects(updatedProject);
     }
 
     const updateConversationCreatedAt = (createdAt: Date, updatedMessages: Message[]) => {
@@ -73,6 +147,19 @@ export const PalProvider = ({ children }) => {
             return conversation;
         });
         setProjectConversations(updatedConversations);
+        // 写进浏览器缓存里
+        const updatedProject = projects.map(project => {
+            if (project.id === projectId) {
+                return {
+                    ...project,
+                    conversations: updatedConversations
+                }
+            }
+            return project;
+        });
+        //@ts-ignore
+        localStorage.setItem('projects', JSON.stringify(updatedProject));
+        setProjects(updatedProject);
     };
 
     return (

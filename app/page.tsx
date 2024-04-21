@@ -4,6 +4,7 @@
 import PromptContext from "./components/PromptContext";
 import { PalProvider } from './components/Context/PalContext';
 import ChatThreads from "./components/ChatThreads";
+import NavBar from "./components/NavBar";
 
 export default function Home() {
   return (
@@ -19,7 +20,7 @@ export default function Home() {
           } as React.CSSProperties}
         >
           <div className="flex-none bg-green-300 p-2" style={{ width: 'var(--col1)' }}>
-            <p>project list</p>
+            <NavBar />
           </div>
           <div className="flex-none bg-blue-300 p-2" style={{ width: 'var(--col2)' }}>
             <PromptContext />

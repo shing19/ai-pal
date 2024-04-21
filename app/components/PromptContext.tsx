@@ -49,7 +49,6 @@ const PromptContext = () => {
         e.preventDefault();
     };
 
-
     // 处理新对话
     const handleSubmitExtended = (e: React.FormEvent<HTMLFormElement>) => {
         setThisMessages([])
@@ -72,6 +71,7 @@ const PromptContext = () => {
         }
     }, [messages])
 
+    // 更新对话
     useEffect(() => {
         // 判断是否是新对话，查看projectConversations里是否有latestConversationCreatedAt
         function ConversationExists() {
