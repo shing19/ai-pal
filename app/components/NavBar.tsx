@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Project } from '@/types/global'
 import { nanoid } from 'ai'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Separator } from '@/components/ui/separator'
  
 const getProjects = (): Project[] => {
     const projects = localStorage.getItem('projects');
@@ -67,9 +68,10 @@ const NavBar = () => {
     }
 
     return (
-        <div>
+        <div className='my-2'>
             <div className='flex flex-col gap-2'>
-                <Button onClick={handleAddProject} >Add new project</Button>
+                <Button variant="outline" style={{ color: 'hsl(var(--primary))', borderColor: 'hsl(var(--primary))' }} onClick={handleAddProject} >Add new project</Button>
+                <Separator />
                 {projects.map(project => (
                     <div className={`flex justify-between ${(visitProjectId === project.id || (!visitProjectId && projects[0].id === project.id)) ? 'bg-gray-200' : ''}`} key={project.id}>
                     <Link className={buttonVariants({ variant: "outline" })} href={`/?projectId=${project.id}`}>{project.name}</Link>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { CheckIcon, Cross2Icon, Pencil1Icon } from '@radix-ui/react-icons'
 import { PalContext } from '../Context/PalContext'
 import { Badge } from "@/components/ui/badge"
+import { Textarea } from '@/components/ui/textarea'
 
 interface ChatDialogProps {
     messages: Message[],
@@ -170,10 +171,10 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
                                 </div>
                             )}
                         </div>
-                        <div className="ml-1 mt-2">
+                        <div className="mx-0.5 mt-2">
                             {edieState[message.id] ? (
-                                <div className='flex flex-col space-y-2 items-center'>
-                                    <textarea
+                                <div className='flex flex-col space-y-2 items-end'>
+                                    <Textarea
                                         value={newContent}
                                         onChange={(e) => setNewContent(e.target.value)}
                                         onKeyDown={(e) => {
@@ -183,16 +184,16 @@ const ChatDialog = ({ messages, conversationCreatedAt }: ChatDialogProps) => {
                                                 handleSave(message.id); // Call the save handler
                                             }
                                         }}
-                                        className="w-full h-auto border-none outline-none rounded"
+                                        className="w-full h-auto box-border rounded"
                                         style={{ resize: 'none' }}
                                     >
-                                    </textarea>
+                                    </Textarea>
                                     <div className='flex space-x-2'>
-                                        <Button variant="outline" size="icon" className="h-5 w-5" onClick={() => handleSave(message.id)}>
-                                            <CheckIcon className="h-3 w-3" />
+                                        <Button variant="secondary" className='h-8' onClick={() => handleCancel(message.id)}>
+                                            取消
                                         </Button>
-                                        <Button variant="outline" size="icon" className="h-5 w-5" onClick={() => handleCancel(message.id)}>
-                                            <Cross2Icon className="h-3 w-3" />
+                                        <Button variant="default" className='h-8' onClick={() => handleSave(message.id)}>
+                                            确认
                                         </Button>
 
                                     </div>

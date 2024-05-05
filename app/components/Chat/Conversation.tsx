@@ -1,6 +1,6 @@
 // Conversation.tsx
 import { ConversationWithinContext } from '@/types/global';
-import React, { useContext, useDebugValue, useEffect, useState } from 'react'
+import React, { useContext, useDebugValue, useEffect, useRef, useState } from 'react'
 import { Message, useChat } from 'ai/react';
 import { PalContext } from '../Context/PalContext';
 import { Cross2Icon } from '@radix-ui/react-icons';
@@ -48,16 +48,19 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
     const { projectConversations, updateConversationCreatedAt, updateProjectConversations } = useContext(PalContext);
     const { input, handleInputChange, handleSubmit, isLoading, messages, setMessages } = useChat();
 
+
     // input text area
-    const [inputHeight, setInputHeight] = useState('auto');
     const [isComposing, setIsComposing] = useState(false); // 添加状态跟踪是否处于组合输入模式
-    useEffect(() => {
-        if (input.length > 80 || /\n{2,}/.test(input)) {
-            setInputHeight('7rem')
-        } else {
-            setInputHeight('2rem')
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const autoResizeTextarea = () => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = '22px'; // 重置高度，允许它减小
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
-    }, [input])
+    };
+    useEffect(() => {
+        autoResizeTextarea();
+    }, [input]);
 
     // delete conversation
     const handleDelete = (createdAt: Date) => {
@@ -96,48 +99,55 @@ const ChatConversation = ({ conversation }: ChatConversationProps) => {
                         messages={conversation.messages}
                         conversationCreatedAt={conversation.createdAt}
                     />
-                    <form onSubmit={(e) => {
-                        e.preventDefault(); // 防止默认提交行为
-                        if (!isComposing) { // 当不处于组合输入状态时才处理提交
-                            handleSubmitExtended(e);
-                        }
-                    }} style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingBottom: '3rem' }}>
-                        <Textarea
-                            placeholder='Say something...'
-                            value={input}
-                            onChange={(e) => {
-                                handleInputChange(e);
-                                e.stopPropagation(); // 阻止事件冒泡
-                            }}
-                            onCompositionStart={() => setIsComposing(true)} // 开始组合输入
-                            onCompositionEnd={() => setIsComposing(false)} // 结束组合输入
-                            onClick={handleTextareaClick}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-                                    e.preventDefault();
-                                    // @ts-ignore
-                                    handleSubmitExtended(e);
-                                    e.stopPropagation(); // 阻止事件冒泡
+                    <div className='mt-2 relative mb-2'>
+                        <div className='max-h-36 overflow-y-auto border-2 rounded-md p-2 shadow-sm text-sm'
+                            style={{ borderColor: 'hsl(val(--input))', borderWidth: '1px' }}>
+                            <form onSubmit={(e) => {
+                                e.preventDefault(); // 防止默认提交行为
+                                if (!isComposing) { // 当不处于组合输入状态时才处理提交
+                                    handleSubmitExtended(e)
                                 }
-                            }}
-                            style={{ display: 'flex', alignItems: 'center', height: inputHeight }}
-                        />
-                        <Button
-                            type="submit"
-                            variant="ghost"
-                            size='icon'
-                            disabled={isLoading} // 根据isLoading状态禁用按钮
-                            style={{
-                                position: 'absolute',
-                                bottom: '0.5rem', // 调整按钮距离底部的距离
-                                right: '0rem', // 调整按钮距离右侧的距离
-                            }}
-                        >
-                            <PaperPlaneIcon />
-                        </Button>
-                    </form>
+                            }}>
+                                <textarea
+                                    ref={textareaRef}
+                                    placeholder='Say something...'
+                                    value={input}
+                                    onChange={(e) => {
+                                        handleInputChange(e);
+                                        e.stopPropagation(); // 阻止事件冒泡
+                                    }}
+                                    onCompositionStart={() => setIsComposing(true)}
+                                    onCompositionEnd={() => {
+                                        setIsComposing(false);
+                                        autoResizeTextarea(); // 在组合输入结束后调整高度
+                                    }}
+                                    onClick={handleTextareaClick}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+                                            e.preventDefault();
+                                            // @ts-ignore
+                                            handleSubmitExtended(e);
+                                            e.stopPropagation(); // 阻止事件冒泡
+                                        }
+                                    }}
+                                    className='w-full block max-h-none text-sm pr-6 outline-none appearance-none resize-none border-0 shadow-none focus:border-0'
+
+                                    style={{ resize: 'none' }}
+                                />
+                                <Button
+                                    type="submit"
+                                    variant="secondary"
+                                    size='icon'
+                                    disabled={isLoading} // 根据isLoading状态禁用按钮
+                                    className='absolute right-2 bottom-2 h-6 w-6 rounded-full'
+                                >
+                                    <PaperPlaneIcon className='h-3 w-3' />
+                                </Button>
+                            </form>
+                        </div>
+                    </div>
                     {conversation.createdAt !== undefined &&
-                        <div>
+                        <div className='w-full flex flex-col items-end'>
                             <Button variant="outline" onClick={(event) => {
                                 event.stopPropagation();
                                 handleDelete(conversation.createdAt)
