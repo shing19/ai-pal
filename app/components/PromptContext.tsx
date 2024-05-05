@@ -188,7 +188,7 @@ const PromptContext = () => {
                     </Button>
                 </div>
                 <div className='mx-1 relative mb-2'>
-                    <div className='max-h-36 overflow-y-auto border-2 rounded-md p-2 shadow-sm text-sm'
+                    <div className='max-h-36 overflow-y-auto border-2 rounded-lg p-2 shadow-sm text-sm'
                         style={{ borderColor: 'hsl(val(--input))', borderWidth: '1px' }}>
                         <form onSubmit={(e) => {
                             e.preventDefault(); // 防止默认提交行为

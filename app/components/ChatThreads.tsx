@@ -1,13 +1,14 @@
 // ChatThreads.tsx
 "use client"
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { PalContext } from './Context/PalContext';
 import ChatConversation from './Chat/Conversation';
 
 const ChatThreads = () => {
     const { projectConversations } = useContext(PalContext);
     const [expandedStates, setExpandedStates] = useState<Record<number, boolean>>({});
-
+    const containerRef = useRef<HTMLDivElement>(null); // 创建一个ref，用于定位滚动容器
+    
     // 折叠状态管理
     useEffect(() => {
         if (projectConversations && projectConversations.length > 0) {
@@ -41,11 +42,19 @@ const ChatThreads = () => {
         }));
     };
 
+    // 监听projectConversations变化滚动到底部
+    useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.scrollIntoView({ block: "end" });
+        }
+    }, [projectConversations]);
+
     return (
-        <div className='flex flex-col gap-y-1'>
+        <div className='flex flex-col gap-y-1 overflow-hidden' ref={containerRef}>
             {projectConversations?.map((conversation, index: number) => {
-                const conversationStyle = expandedStates[index] ? { height: 'auto', transition: '' } : { height: '5rem', overflow: 'hidden', borderRadius: '0.75rem', transition: ''};
-                conversationStyle.transition = 'height 0.8s ease-in-out';
+                const conversationStyle = expandedStates[index] ?
+                    { height: 'auto', transition: 'height 0.8s ease-in-out', border: '1px solid hsl(var(--input))', borderRadius: '0.5rem', overflow: 'visible' } :
+                    { height: '10rem', overflow: 'hidden', border: '1px solid hsl(var(--input))', borderRadius: '0.5rem', transition: 'height 0.8s ease-in-out' };
                 return conversation.messages.length > 0 ? (
                     <div key={index} style={conversationStyle} onClick={(e) => toggleExpansion(index, e)}>
                         <ChatConversation conversation={conversation} />
